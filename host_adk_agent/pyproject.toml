@@ -1,0 +1,26 @@
+# This file can be added to the project with `uv add` and 
+# serves as the central, standardized configuration
+# for the project. Its defines the metadata and abstract dependencies 
+# it defines the workspace for the a2a-friend-scheduling project.
+# and tells uv that this project containing multiple packages.
+
+[project]
+name = "a2a-friend-scheduling"
+version = "0.1.0"
+description = "A multi-agent system for scheduling pickleball games."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    # Shared ADK & A2A Dependencies
+    "google-adk>=1.2.1",
+    "a2a-sdk>=0.2.5",
+    "nest-asyncio>=1.6.0",
+    "python-dotenv",
+    "click",
+    "uvicorn",
+    "google-generativeai",
+    "httpx",
+
+    # Elliot's agent dependencies (future)
+    # "langgraph"
+]
