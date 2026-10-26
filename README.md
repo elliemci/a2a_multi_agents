@@ -1,80 +1,44 @@
-**Scheduling Multi-Agent**
+# A2A Multi-Agent Scheduling
 
-Preview in VS Code: Cmd+Shift+V
+A small multi-agent demo. A Google ADK host agent, run in ADK Web, uses the A2A (Agent2Agent) protocol to ask three friend agents when they are free. Each friend agent is built with a different framework (ADK, CrewAI, LangGraph). The host then finds a common time and books a pickleball court.
+
 ![Multi-agent scheduling](./multi_agent_scheduling.png)
 
-A multi-agent sytem in which an ADK host agent in ADK Web using A2A protocol connects to thre remote agents and orchestrates a comunication between these external facing personal server agents to schedule a friends meeting
+> **Requirements:** Python (the LangGraph agent's `pyproject.toml` asks for 3.12 or newer), [`uv`](https://docs.astral.sh/uv/), and a Google API key for Gemini. Each agent folder has a `.env.example`. Copy it to `.env` and fill in `GOOGLE_API_KEY`. No GPU is needed. The agents run on `localhost`, one terminal each, and the Gemini calls need internet access.
 
-**Setup and Run Host Agent**
+## What the repo contains
 
-Use uv to create different frameworks and environments in the roots of each agent dir;
-in the root of projet directory create a venv and save Google API key in .env:
+| Folder | What it does | How to run | Port |
+|---|---|---|---|
+| `host_adk_agent/` | The host. A Python `HostAgent` class reads each friend's agent card, puts their names and descriptions into the ADK agent's instructions, and gives the agent three tools. `send_message` sends an A2A message to a friend. `list_court_availabilities` and `book_pickleball_court` (in `pickleball_tools.py`) work on an in-memory court schedule. | Start the three friends first, then `cd host_adk_agent && uv venv && source .venv/bin/activate && uv run adk web` | ADK Web (default) |
+| `emma_adk_agent/` | Remote friend built with Google ADK. Tool: `get_availability` over a randomly generated 7-day calendar. | `cd emma_adk_agent && uv venv && source .venv/bin/activate && uv run --active .` | 10002 |
+| `mike_crewai_agent/` | Remote friend built with CrewAI. One agent, one task, `AvailabilityTool`. | `cd mike_crewai_agent && uv venv && source .venv/bin/activate && uv run --active .` (see gaps: the old README had a typo here) | 10003 |
+| `elliot_langgraph_agent/` | Remote friend built with LangGraph (`create_react_agent` with a `get_availability` tool). | `cd elliot_langgraph_agent && uv venv && source .venv/bin/activate && uv run app/__main__.py` | 10004 |
 
-uv pip install google-adk a2a-sdk
-uv add "crewai[google-genai]"
+The ports are hardcoded in each agent's `__main__.py`. The host has the same three URLs hardcoded in `host_adk_agent/host/agent.py`. Every friend's calendar is random and is regenerated each time the agent starts, so the availability is made up. `remote_server.png` is a diagram of the remote-agent setup.
 
-uv venv
-source .venc/bin/activate
+![Remote server setup](./remote_server.png)
 
-Host agent is setup differently than the server agents. It has Prompts and Tools. The prompt consists of Core Instructions and dynamicly passing all the Available Agents remote urls. The tools are "hardwired" and a A2A send_message tool requests to the avilable agents:
+## What I did
 
-The Host Agent is a Python regular Class, which defines an the ADK Host Agent.
+- Adapted the tutorial's code template into this system: a host plus three remote agents (Emma in ADK, Mike in CrewAI, Elliot in LangGraph). The CrewAI and LangGraph logic is adapted from the tutorial's template; I did not write it from scratch.
+- Replaced the tutorial's sample names with the names used in this code (Ellie, Emma, Mike, Elliot). The host agent itself is still named `Host_Agent` in `host_adk_agent/host/agent.py`.
+- I did not change the logic in `host_adk_agent/host/agent.py` or `pickleball_tools.py`; they are the tutorial's.
+- Set up the agents with the code template and ran the system successfully end to end with the `gemini-2.5-flash` model in ADK Web (The run commands written in this README have not been re-tested since.)
+- Wrote the README with setup steps and the two diagrams, and added the per-agent `uv` environments, `pyproject.toml` files, `.env.example` templates and `.gitignore`.
 
-Host Agent Workflow:
+## What came from a tutorial or sample
 
-1. Create host Agent and pass in remote url for each friend agent
-2. Prep Agent Creation:
-   - for each url get AgentCard and save agent info, name, description to the python Host Agent class self.agents
-3. Create ADK Agents:
-   - pass in the list of remote agents self.agents to the Available Agents in the root instructions
-4. Send Messsage
-   - pass in agent name
-   - make sure the remote connection is present
-   - send A2A message
+This repo is an adaptation of the "Agent2Agent Crash Course" on YouTube: https://www.youtube.com/watch?v=mFkw3p5qSuA&t=2391s. The tutorial's source code is no longer public, so there is no code repo to link to. From it I took the overall design: a host that reads each friend's agent card and routes messages by agent name, and remote agents that each run an A2A server (agent card, executor) in a different framework. The host code and the court-booking tools are the tutorial's logic; the three friend agents are adapted from its template (see "What I did").
 
-The ADK host agent can be created with `adk create host` in host_agent_adk dir
-run with `adk web` in host_agent_adk dir
+## Shared folders
 
-**Setup and Run Remote Agents**
+There is no shared code. Each agent folder is its own `uv` project. The root `.env.example` and `.gitignore` apply to the whole repo. The host needs all three friends running to use them. If one is down, `HostAgent` prints an error for that address and carries on without it.
 
-![Remote Server Setup](./remote_server.png)
+## Known gaps / next steps
 
-```bash
-echo 'GOOGLE_API_KEY="YOUR_API_KEY"' > .env
-```
-
-To create an ADK agent `adk create emma_adk_agent` in project dir
-
-```shell
-cd emma_adk_agent
-uv venv
-source .venv/bin/activate
-uv run --active .
-```
-
-```shell
-cd mike_crewai_agent
-uv venv
-source .venv/bin/activate
-uv run active .
-```
-
-```shell
-cd elliot_langgraph_agent
-uv venv
-source .venv/bin/activate
-uv run app/__main__.py
-```
-
-Create a .env file in root of the projects of the host and the google agent directories with Google API Key:
-
-**Deployment**
-
-Each agent can have its own environment, but also can be part of one project environment, and it is run in a separate terminal. Once all agents are running, run the host to beging the scheduling process as it interacts with all agents.
-
-```shell
-cd host_adk_agent
-uv venv
-source .venv/bin/activate
-uv run adk web
-```
+- The tutorial's source is no longer public, so you cannot diff this repo against the original. The git history alone does not show what is mine versus adapted.
+- No example output, recording or test of a full scheduling run is in the repo. I ran it end to end myself (see "What I did"), but the run commands in this README have not been re-tested.
+- Ordering note for me: the rename commit (`8a04a1c`, "Rename leftover sample names...") is on the `docs/readme` branch, not on `main`, and `elliot_langgraph_agent/app/agent.py` still has an uncommitted change. Commit the rename before the merge with `main`.
+- Calendars and the court schedule are random or in-memory and reset on restart. There are no real calendars or persistence.
+- Setup instructions in the old README were inconsistent (`.venc`, `uv run active .`). I corrected them above from the folder layout, but have not tested them. The root `pyproject.toml` of the host still lists LangGraph as "future".

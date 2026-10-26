@@ -15,10 +15,10 @@ memory = MemorySaver()
 
 
 def generate_elliot_calendar() -> dict[str, list[str]]:
-    """Generates Kaitlyn's calendar for the next 7 days."""
+    """Generates Elliot's calendar for the next 7 days."""
     calendar = {}
     today = date.today()
-    # Kaitlyn's availability: evenings on weekdays, more free on weekends.
+    # Elliot's availability: evenings on weekdays, more free on weekends.
     for i in range(7):
         current_date = today + timedelta(days=i)
         date_str = current_date.strftime("%Y-%m-%d")
@@ -106,7 +106,7 @@ class ElliotAgent:
 
     SYSTEM_INSTRUCTION = (
         "You are Elliot's scheduling assistant. "
-        "Your sole purpose is to use the 'get_availability' tool to answer questions about Kaitlyn's schedule for playing pickleball. "
+        "Your sole purpose is to use the 'get_availability' tool to answer questions about Elliot's schedule for playing pickleball. "
         "You will be provided with the current date to help you understand relative date queries like 'tomorrow' or 'next week'. "
         "Use this information to correctly call the tool with a specific date (e.g., 'YYYY-MM-DD'). "
         "If the user asks about anything other than scheduling pickleball, "
