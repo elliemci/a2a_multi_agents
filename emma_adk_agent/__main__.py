@@ -50,7 +50,7 @@ def main():
             name="Check Emma's Schedule",
             description="Checks Emma's availability for a pickleball game on a given date.",
             tags=["scheduling", "calendar"],
-            examples=["Is Karley free to play pickleball tomorrow?"],
+            examples=["Is Emma free to play pickleball tomorrow?"],
         )
         agent_card = AgentCard(
             name="Emma Agent",

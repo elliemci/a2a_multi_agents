@@ -121,7 +121,7 @@ class HostAgent:
         *   **Transparent Communication:** Relay the final booking confirmation, including the booking ID, to the user. Do not ask for permission before contacting friend agents.
         *   **Tool Reliance:** Strictly rely on available tools to address user requests. Do not generate responses based on assumptions.
         *   **Readability:** Make sure to respond in a concise and easy to read format (bullet points are good).
-        *   Each available agent represents a friend. So Bob_Agent represents Bob.
+        *   Each available agent represents a friend. So Ellie_Agent represents Ellie.
         *   When asked for which friends are available, you should return the names of the available friends (aka the agents that are active).
         *   When get
 

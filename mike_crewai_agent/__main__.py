@@ -31,7 +31,7 @@ class MissingAPIKeyError(Exception):
 
 
 def main():
-    """Entry point for Nate's Scheduling Agent."""
+    """Entry point for Mike's Scheduling Agent."""
     host = "localhost"
     port = 10003
     try:
@@ -53,7 +53,7 @@ def main():
         agent_host_url = os.getenv("HOST_OVERRIDE") or f"http://{host}:{port}/"
         agent_card = AgentCard(
             name="Mike Agent",
-            description="A friendly agent to help you schedule a pickleball game with Nate.",
+            description="A friendly agent to help you schedule a pickleball game with Mike.",
             url=agent_host_url,
             version="1.0.0",
             defaultInputModes=SchedulingAgent.SUPPORTED_CONTENT_TYPES,

@@ -39,7 +39,7 @@ def generate_elliot_calendar() -> dict[str, list[str]]:
     return calendar
 
 
-KAITLYNS_CALENDAR = generate_elliot_calendar()
+ELLIOTS_CALENDAR = generate_elliot_calendar()
 
 
 class AvailabilityToolInput(BaseModel):
@@ -73,7 +73,7 @@ def get_availability(date_range: str) -> str:
         for i in range(delta.days + 1):
             day = start + timedelta(days=i)
             date_str = day.strftime("%Y-%m-%d")
-            available_slots = KAITLYNS_CALENDAR.get(date_str, [])
+            available_slots = ELLIOTS_CALENDAR.get(date_str, [])
             if available_slots:
                 availability = (
                     f"On {date_str}, Elliot is available at: "
